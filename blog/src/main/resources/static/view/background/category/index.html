@@ -1,0 +1,184 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>开启分页 - 数据表格</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="./../layuiadmin/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="./../layuiadmin/style/admin.css" media="all">
+</head>
+<body>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a lay-href="">主页</a>
+    <a><cite>组件</cite></a>
+    <a><cite>数据表格</cite></a>
+    <a><cite>开启分页</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-header">类别列表</div>
+        <div class="layui-card-header layuiadmin-card-header-auto">
+          <button class="layui-btn layuiadmin-btn-tags" data-type="add">添加</button>
+        </div>
+        <div class="layui-card-body">
+          <table class="layui-hide" id="test-table-operate" lay-filter="test-table-operate"></table>
+          <script type="text/html" id="test-table-operate-barDemo" >
+            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+          </script>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="./../layuiadmin/layui/layui.js"></script>
+<script>
+    layui.config({
+        base: './../layuiadmin/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'table'], function(){
+        var admin = layui.admin
+            ,table = layui.table;
+
+        table.render({
+            elem: '#test-table-operate'
+            ,url: '/blog/category/list'
+            ,method: 'post'
+            ,cols: [[
+                // {type:'checkbox', fixed: 'left'},
+                {field:'categoryId', title: '类别ID', sort: true}
+                ,{field:'categoryName', title: '类别名'}
+                ,{width:178, align:'center', fixed: 'right', toolbar: '#test-table-operate-barDemo'}
+            ]]
+            ,page: true
+        });
+
+        var $ = layui.$, active = {
+            add: function(){
+                layer.open({
+                    type: 2
+                    ,title: '添加类别'
+                    ,content: 'categorysform.html'
+                    ,area: ['450px', '200px']
+                    ,btn: ['确定', '取消']
+                    ,yes: function(index, layero){
+                        var othis = layero.find('iframe').contents().find("#layuiadmin-app-form-tags")
+                            ,categorise = othis.find('input[name="categorise"]').val();
+                        if(!categorise.replace(/\s/g, '')) return;
+
+
+                        //ajax提交
+                        $.ajax({
+                            type: "POST",
+                            dataType: "json",
+                            url: "/blog/category/add",
+                            async: false,
+                            contentType: 'application/json; charset=UTF-8',
+                            data: JSON.stringify({
+                                'categoryName': categorise
+                            }),
+                            success: function(result) {
+                                layer.msg('保存成功！', {time:500});
+                            },
+                            error: function() {
+                                layer.msg('保存失败！', {time:500});
+                            }
+                        });
+                        table.reload('test-table-operate');
+                        layer.close(index);
+
+                    }
+
+                });
+            }
+        };
+        $('.layui-btn.layuiadmin-btn-tags').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        table.on('tool(test-table-operate)', function(obj){
+            console.log(1);
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                    //ajax提交
+                    $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        async: false,
+                        url: "/blog/category/delete",
+                        contentType: 'application/json; charset=UTF-8',
+                        data: JSON.stringify({
+                            'categoryId': data.categoryId
+                        }),
+                        success: function(result) {
+                            layer.msg('删除成功！', {time:500});
+                        },
+                        error: function() {
+                            layer.msg('删除失败！', {time:500});
+                        }
+                    });
+                    table.reload('test-table-operate');
+                    layer.close(index);
+                });
+            } else if(obj.event === 'edit'){
+                layer.open({
+                    type: 2
+                    ,title: '编辑类别'
+                    ,content: 'categorysform.html'
+                    ,area: ['450px', '200px']
+                    ,btn: ['确定', '取消']
+                    ,success:function (layero, index) {
+                        var body = layui.layer.getChildFrame('body', index);
+                        body.find(".categoryName").val(data.categoryName);
+                    }
+                    ,yes: function(index, layero){
+                        var othis = layero.find('iframe').contents().find("#layuiadmin-app-form-tags")
+                        var categorise = othis.find('input[name="categorise"]').val();
+                        if(!categorise.replace(/\s/g, '')) return;
+
+
+                        //ajax提交
+                        $.ajax({
+                            type: "POST",
+                            dataType: "json",
+                            url: "/blog/category/update",
+                            async: false,
+                            contentType: 'application/json; charset=UTF-8',
+                            data: JSON.stringify({
+                                'categoryName': categorise,
+                                'categoryId':data.categoryId
+                            }),
+                            success: function(result) {
+                                layer.msg('更新成功！', {time:500});
+                            },
+                            error: function() {
+                                layer.msg('更新失败！', {time:500});
+                            }
+                        });
+                        table.reload('test-table-operate');
+                        layer.close(index);
+
+                    }
+
+                });
+            }
+        });
+
+    });
+</script>
+</body>
+</html>

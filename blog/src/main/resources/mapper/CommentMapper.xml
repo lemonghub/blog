@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmgl.blog.dao.CommentMapper" >
+  <resultMap id="BaseResultMap" type="com.xmgl.blog.entity.Comment" >
+    <id column="comment_id" property="commentId" jdbcType="INTEGER" />
+    <result column="article_id" property="articleId" jdbcType="INTEGER" />
+    <result column="comment_name" property="commentName" jdbcType="VARCHAR" />
+    <result column="comment_content" property="commentContent" jdbcType="VARCHAR" />
+    <result column="is_topping" property="isTopping" jdbcType="BIT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    comment_id, article_id, comment_name, comment_content, is_topping
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_comment
+    where comment_id = #{commentId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from tb_comment
+    where comment_id = #{commentId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.xmgl.blog.entity.Comment" >
+    insert into tb_comment (comment_id, article_id, comment_name, 
+      comment_content, is_topping)
+    values (#{commentId,jdbcType=INTEGER}, #{articleId,jdbcType=INTEGER}, #{commentName,jdbcType=VARCHAR}, 
+      #{commentContent,jdbcType=VARCHAR}, #{isTopping,jdbcType=BIT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xmgl.blog.entity.Comment" >
+    insert into tb_comment
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="commentId != null" >
+        comment_id,
+      </if>
+      <if test="articleId != null" >
+        article_id,
+      </if>
+      <if test="commentName != null" >
+        comment_name,
+      </if>
+      <if test="commentContent != null" >
+        comment_content,
+      </if>
+      <if test="isTopping != null" >
+        is_topping,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="commentId != null" >
+        #{commentId,jdbcType=INTEGER},
+      </if>
+      <if test="articleId != null" >
+        #{articleId,jdbcType=INTEGER},
+      </if>
+      <if test="commentName != null" >
+        #{commentName,jdbcType=VARCHAR},
+      </if>
+      <if test="commentContent != null" >
+        #{commentContent,jdbcType=VARCHAR},
+      </if>
+      <if test="isTopping != null" >
+        #{isTopping,jdbcType=BIT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xmgl.blog.entity.Comment" >
+    update tb_comment
+    <set >
+      <if test="articleId != null" >
+        article_id = #{articleId,jdbcType=INTEGER},
+      </if>
+      <if test="commentName != null" >
+        comment_name = #{commentName,jdbcType=VARCHAR},
+      </if>
+      <if test="commentContent != null" >
+        comment_content = #{commentContent,jdbcType=VARCHAR},
+      </if>
+      <if test="isTopping != null" >
+        is_topping = #{isTopping,jdbcType=BIT},
+      </if>
+    </set>
+    where comment_id = #{commentId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xmgl.blog.entity.Comment" >
+    update tb_comment
+    set article_id = #{articleId,jdbcType=INTEGER},
+      comment_name = #{commentName,jdbcType=VARCHAR},
+      comment_content = #{commentContent,jdbcType=VARCHAR},
+      is_topping = #{isTopping,jdbcType=BIT}
+    where comment_id = #{commentId,jdbcType=INTEGER}
+  </update>
+</mapper>

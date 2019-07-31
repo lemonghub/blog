@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmgl.blog.dao.ArticleMapper" >
+  <resultMap id="BaseResultMap" type="com.xmgl.blog.entity.Article" >
+    <id column="article_id" property="articleId" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="introduction" property="introduction" jdbcType="VARCHAR" />
+    <result column="click_num" property="clickNum" jdbcType="INTEGER" />
+    <result column="is_topping" property="isTopping" jdbcType="BIT" />
+    <result column="category_id" property="categoryId" jdbcType="INTEGER" />
+    <result column="post_status" property="postStatus" jdbcType="INTEGER" />
+    <result column="create_at" property="createAt" jdbcType="TIMESTAMP" />
+    <result column="update_at" property="updateAt" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.xmgl.blog.entity.Article" extends="BaseResultMap" >
+    <result column="content" property="content" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    article_id, title, introduction, click_num, is_topping, category_id, post_status, 
+    create_at, update_at
+  </sql>
+  <sql id="Blob_Column_List" >
+    content
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from tb_article
+    where article_id = #{articleId,jdbcType=INTEGER}
+  </select>
+  <select id="selectArticleByPager" resultType="com.xmgl.blog.model.ArticleModel">
+    SELECT *
+    FROM tb_article a left join tb_category c on a.category_id=c.category_id
+    <where>
+      <if test="title != null">
+        AND title LIKE '%${title}%'
+      </if>
+      <if test="categoryId != null">
+        AND a.category_id LIKE '%${categoryId}%'
+      </if>
+    </where>
+    ORDER By a.article_id
+    LIMIT #{start}, #{limit}
+  </select>
+  <select id="selectArticleListCount" resultType="java.lang.Integer">
+    SELECT COUNT(*)
+    FROM tb_article a left join tb_category c on a.category_id=c.category_id
+    <where>
+      <if test="title != null">
+        AND title LIKE '%${title}%'
+      </if>
+    </where>
+  </select>
+  <select id="selectAllArticle" resultType="com.xmgl.blog.entity.Article">
+    SELECT *
+    FROM tb_article
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from tb_article
+    where article_id = #{articleId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteArticleById" parameterType = "java.util.List">
+    delete from tb_article where 1>2
+         or article_id in
+    <foreach item="item" collection="list" open="(" separator="," close=")">
+      #{item.articleId}
+    </foreach>
+  </delete>
+  <insert id="insert" parameterType="com.xmgl.blog.entity.Article" >
+    insert into tb_article (article_id, title, introduction, 
+      click_num, is_topping, category_id, 
+      post_status, create_at, update_at, 
+      content)
+    values (#{articleId,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{introduction,jdbcType=VARCHAR}, 
+      #{clickNum,jdbcType=INTEGER}, #{isTopping,jdbcType=BIT}, #{categoryId,jdbcType=INTEGER}, 
+      #{postStatus,jdbcType=INTEGER}, #{createAt,jdbcType=TIMESTAMP}, #{updateAt,jdbcType=TIMESTAMP},
+      #{content,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xmgl.blog.entity.Article" useGeneratedKeys="true" keyProperty="articleId">
+    insert into tb_article
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="articleId != null" >
+        article_id,
+      </if>
+      <if test="title != null" >
+        title,
+      </if>
+      <if test="introduction != null" >
+        introduction,
+      </if>
+      <if test="clickNum != null" >
+        click_num,
+      </if>
+      <if test="isTopping != null" >
+        is_topping,
+      </if>
+      <if test="categoryId != null" >
+        category_id,
+      </if>
+      <if test="postStatus != null" >
+        post_status,
+      </if>
+      <if test="createAt != null" >
+        create_at,
+      </if>
+      <if test="updateAt != null" >
+        update_at,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="articleId != null" >
+        #{articleId,jdbcType=INTEGER},
+      </if>
+      <if test="title != null" >
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="introduction != null" >
+        #{introduction,jdbcType=VARCHAR},
+      </if>
+      <if test="clickNum != null" >
+        #{clickNum,jdbcType=INTEGER},
+      </if>
+      <if test="isTopping != null" >
+        #{isTopping,jdbcType=BIT},
+      </if>
+      <if test="categoryId != null" >
+        #{categoryId,jdbcType=INTEGER},
+      </if>
+      <if test="postStatus != null" >
+        #{postStatus,jdbcType=INTEGER},
+      </if>
+      <if test="createAt != null" >
+        #{createAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateAt != null" >
+        #{updateAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xmgl.blog.entity.Article" >
+    update tb_article
+    <set >
+      <if test="title != null" >
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="introduction != null" >
+        introduction = #{introduction,jdbcType=VARCHAR},
+      </if>
+      <if test="clickNum != null" >
+        click_num = #{clickNum,jdbcType=INTEGER},
+      </if>
+      <if test="isTopping != null" >
+        is_topping = #{isTopping,jdbcType=BIT},
+      </if>
+      <if test="categoryId != null" >
+        category_id = #{categoryId,jdbcType=INTEGER},
+      </if>
+      <if test="postStatus != null" >
+        post_status = #{postStatus,jdbcType=INTEGER},
+      </if>
+      <if test="createAt != null" >
+        create_at = #{createAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateAt != null" >
+        update_at = #{updateAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where article_id = #{articleId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.xmgl.blog.entity.Article" >
+    update tb_article
+    set title = #{title,jdbcType=VARCHAR},
+      introduction = #{introduction,jdbcType=VARCHAR},
+      click_num = #{clickNum,jdbcType=INTEGER},
+      is_topping = #{isTopping,jdbcType=BIT},
+      category_id = #{categoryId,jdbcType=INTEGER},
+      post_status = #{postStatus,jdbcType=INTEGER},
+      create_at = #{createAt,jdbcType=TIMESTAMP},
+      update_at = #{updateAt,jdbcType=TIMESTAMP},
+      content = #{content,jdbcType=LONGVARCHAR}
+    where article_id = #{articleId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xmgl.blog.entity.Article" >
+    update tb_article
+    set title = #{title,jdbcType=VARCHAR},
+      introduction = #{introduction,jdbcType=VARCHAR},
+      click_num = #{clickNum,jdbcType=INTEGER},
+      is_topping = #{isTopping,jdbcType=BIT},
+      category_id = #{categoryId,jdbcType=INTEGER},
+      post_status = #{postStatus,jdbcType=INTEGER},
+      create_at = #{createAt,jdbcType=TIMESTAMP},
+      update_at = #{updateAt,jdbcType=TIMESTAMP}
+    where article_id = #{articleId,jdbcType=INTEGER}
+  </update>
+</mapper>
