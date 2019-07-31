@@ -1,8 +1,7 @@
 package com.xmgl.blog.config;
 
 
-import com.xmgl.blog.controller.back.interceptor.SessionInterceptor;
-import org.springframework.beans.factory.annotation.Value;
+import com.xmgl.blog.controller.interceptor.SessionInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;

@@ -57,6 +57,11 @@
     SELECT *
     FROM tb_article
   </select>
+  <select id="selectArticleList" resultType="com.xmgl.blog.model.ArticleModel">
+    SELECT *
+    FROM tb_article a left join tb_category c on a.category_id=c.category_id
+    ORDER By a.article_id
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from tb_article
     where article_id = #{articleId,jdbcType=INTEGER}

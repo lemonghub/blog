@@ -32,4 +32,6 @@ public interface ArticleMapper {
 
     int deleteArticleById(List<ArticleModel> list);
 
+    List<ArticleModel> selectArticleList();
+
 }

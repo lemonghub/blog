@@ -77,4 +77,6 @@ public interface ArticleService {
      * @return
      */
     ServerResponse updateArticleTop(Article article);
+
+    List<ArticleModel> selectArticleListQ();
 }

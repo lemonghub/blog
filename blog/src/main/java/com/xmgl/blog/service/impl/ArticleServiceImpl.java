@@ -100,4 +100,10 @@ public class ArticleServiceImpl implements ArticleService {
         articleMapper.updateByPrimaryKeySelective(article);
         return ServerResponse.createBySuccess();
     }
+
+    @Override
+    public List<ArticleModel> selectArticleListQ() {
+        List<ArticleModel> customers = articleMapper.selectArticleList();
+        return customers;
+    }
 }
